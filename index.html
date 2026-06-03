@@ -21,153 +21,26 @@
             --admin-color: #10b981;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body { 
-            background-color: var(--bg); 
-            color: var(--text-main); 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden;
-            background-image: radial-gradient(circle at 50% -20%, rgba(79, 70, 229, 0.15), transparent 50%);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; background-image: radial-gradient(circle at 50% -20%, rgba(79, 70, 229, 0.15), transparent 50%); }
 
-        header { 
-            background: rgba(6, 7, 13, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border); 
-            padding: 10px 16px; 
-            display: flex; 
-            justify-content: flex-end; 
-            align-items: center; 
-            z-index: 10; 
-            height: 54px;
-            flex-shrink: 0;
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .user-config input { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid var(--border); 
-            color: #fff; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-size: 14px; 
-            width: 140px; 
-            outline: none;
-            text-align: center;
-        }
+        header { background: rgba(6, 7, 13, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; justify-content: flex-end; align-items: center; z-index: 10; height: 54px; flex-shrink: 0; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .user-config input { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 14px; width: 140px; outline: none; text-align: center; }
         
-        .btn-header {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        .btn-header:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-        }
-        .btn-header.is-admin {
-            background: rgba(16, 185, 129, 0.15);
-            border-color: var(--admin-color);
-            color: #a6e3a1;
-        }
-        
-        /* Bouton Reset Global Admin */
-        .btn-reset-global {
-            background: rgba(255, 90, 121, 0.1);
-            border: 1px solid rgba(255, 90, 121, 0.2);
-            color: var(--danger);
-            display: none; /* Caché par défaut */
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        .btn-reset-global:hover {
-            background: var(--danger);
-            color: #fff;
-        }
-        body.admin-mode .btn-reset-global {
-            display: flex; /* Visible uniquement pour l'admin */
-        }
+        .btn-header { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .btn-header:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
+        .btn-header.is-admin { background: rgba(16, 185, 129, 0.15); border-color: var(--admin-color); color: #a6e3a1; }
 
-        .main-container { 
-            flex: 1; 
-            display: flex; 
-            width: 100%; 
-            height: calc(100vh - 54px); 
-            overflow: hidden; 
-            position: relative; 
-        }
-        
-        .feed-container { 
-            flex: 1; 
-            display: grid;
-            grid-template-rows: 1fr auto; 
-            height: 100%; 
-            min-width: 320px;
-            background: transparent;
-        }
-
-        .posts-list { 
-            overflow-y: auto; 
-            padding: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-        }
-
-        .post-card { 
-            background: var(--surface); 
-            backdrop-filter: blur(8px); 
-            border: 1px solid var(--border); 
-            border-radius: 14px; 
-            padding: 14px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            cursor: pointer; 
-            position: relative;
-        }
+        .main-container { flex: 1; display: flex; width: 100%; height: calc(100vh - 54px); overflow: hidden; position: relative; }
+        .feed-container { flex: 1; display: grid; grid-template-rows: 1fr auto; height: 100%; min-width: 320px; background: transparent; }
+        .posts-list { overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .post-card { background: var(--surface); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer; position: relative; }
         .post-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); padding-right: 24px; }
         .post-author { color: var(--text-main); font-weight: 600; }
         .post-text { font-size: 14px; line-height: 1.5; color: #e2e8f0; word-break: break-word; }
         
-        .btn-delete-post {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: none;
-            padding: 4px;
-            border-radius: 6px;
-            z-index: 5;
-        }
+        .btn-delete-post { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--text-muted); cursor: pointer; display: none; padding: 4px; border-radius: 6px; z-index: 5; }
         .btn-delete-post:hover { color: var(--danger); }
         body.admin-mode .btn-delete-post { display: block; }
         
@@ -204,6 +77,7 @@
 
         @media (max-width: 850px) {
             .thread-panel, .ide-panel { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 100; }
+            .composer { padding-bottom: 24px; }
         }
     </style>
 </head>
@@ -211,9 +85,6 @@
 
     <header>
         <div class="header-actions">
-            <button class="btn-reset-global" onclick="resetNetworkFeed()">
-                <i data-lucide="trash-2"></i> <span>Reset Global</span>
-            </button>
             <button id="adminBtn" class="btn-header" onclick="verifyAdminStatus()">
                 <i data-lucide="shield"></i> <span id="adminBtnText">Vérifier Statut Admin</span>
             </button>
@@ -289,18 +160,13 @@
     const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://gundb-relay.onrender.com/gun']);
     const postsNode = gun.get('mesh-posts-verif-v5');
     const blacklistNode = gun.get('mesh-blacklist-verif-v5');
-    const systemControlNode = gun.get('mesh-system-control-v5'); // Noeud de commande global
+    const repliesNode = gun.get('mesh-replies-verif-v5');
 
-    // =========================================================================
-    // 🔒 CONFIGURATION CRITIQUE : UN SEUL ADMIN POSSIBLE
-    // Colles ici la clé publique obtenue via le script de l'étape précédente.
-    // =========================================================================
     const MAIN_ADMIN_PUBLIC_KEY = "METS_TA_CLE_PUBLIQUE_ICI"; 
-    // =========================================================================
 
     let isAdminActive = false;
     let blacklistedIds = {};
-    let currentResetTimestamp = 0; // Timestamp barrière pour masquer les vieux messages
+    let currentResetTimestamp = 0; 
 
     const mySeed = 'u_' + Math.random().toString(36).substr(2, 4);
     let activeThreadId = null;
@@ -334,45 +200,11 @@
         document.getElementById('adminBtnText').innerText = "Mode Admin Confirmé";
     }
 
-    // 💥 NOUVELLE FONCTION : RESET GLOBAL RESEAU
-    async function resetNetworkFeed() {
-        if(!isAdminActive) return;
-        if(confirm("⚠️ ATTENTION ! Effacer TOUS les messages du fil de discussion pour TOUT LE MONDE ?")) {
-            const resetTime = Date.now();
-            // On diffuse l'heure du reset sur le réseau
-            systemControlNode.put({
-                action: "global_reset",
-                timestamp: resetTime
-            });
-        }
-    }
-
-    // ÉCOUTEUR DU RESET RESEAU (Tout le monde obéit)
-    systemControlNode.on((data) => {
-        if(data && data.action === "global_reset" && data.timestamp > currentResetTimestamp) {
-            currentResetTimestamp = data.timestamp;
-            
-            // 1. Vide instantanément l'affichage
-            document.getElementById('globalFeed').innerHTML = '';
-            closeThread();
-            
-            // 2. Nettoie le stockage local historique
-            localPostsCache = {};
-            localStorage.setItem('mesh_posts_backup', JSON.stringify(localPostsCache));
-            console.log("🧹 Le fil de discussion a été réinitialisé par l'administrateur.");
-        }
-    });
-
     async function deletePostNetwork(postId, event) {
         if(event) event.stopPropagation();
         if(!isAdminActive) return;
-
         if(confirm("Bannir définitivement ce message ?")) {
-            blacklistNode.get(postId).put({
-                action: "delete",
-                target: postId,
-                authorityProof: true
-            });
+            blacklistNode.get(postId).put({ action: "delete", target: postId, authorityProof: true });
         }
     }
 
@@ -381,7 +213,6 @@
             blacklistedIds[id] = true;
             const el = document.getElementById(id);
             if(el) el.remove();
-            
             if(localPostsCache[id]) {
                 delete localPostsCache[id];
                 localStorage.setItem('mesh_posts_backup', JSON.stringify(localPostsCache));
@@ -520,8 +351,6 @@
 
     postsNode.map().on((post, id) => {
         if (!post || !id || blacklistedIds[id] || blacklistedIds[post.id]) return;
-        
-        // SÉCURITÉ RESET : Si le message est plus vieux que le dernier Reset Global, on l'ignore
         const msgTime = post.timestamp || Date.now();
         if (msgTime < currentResetTimestamp) return;
 
@@ -548,7 +377,6 @@
             if (!parentPost || blacklistedIds[postId] || parentPost.timestamp < currentResetTimestamp) return;
             const container = document.createElement('div'); container.innerHTML = generateCardHTML(parentPost, true);
             threadFeed.appendChild(container.firstElementChild);
-            
             repliesNode.get(postId).map().on((reply, rId) => {
                 if (!reply || document.getElementById(rId) || blacklistedIds[rId] || reply.timestamp < currentResetTimestamp) return;
                 const rContainer = document.createElement('div'); rContainer.innerHTML = generateCardHTML(reply, true);
