@@ -7,26 +7,145 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* --- Variables globales --- */
+:root {
+    --bg: #06070d;
+    --surface: rgba(20, 22, 37, 0.6);
+    --border: rgba(255, 255, 255, 0.08);
+    --text-main: #f1f3f9;
+    --text-muted: #767c98;
+    --accent: #86e1fc;
+    --accent-gradient: linear-gradient(135deg, #86e1fc, #4f46e5);
+    --code-bg: #090a10;
+    --danger: #ff5a79;
+}
 
+/* --- Reset et Base --- */
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body { 
+    background-color: var(--bg); 
+    color: var(--text-main); 
+    display: flex; 
+    flex-direction: column; 
+    height: 100vh; 
+    overflow: hidden;
+    background-image: radial-gradient(circle at 50% -20%, rgba(79, 70, 229, 0.15), transparent 50%);
+}
+
+/* --- Header --- */
+header { 
+    background: rgba(6, 7, 13, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); 
+    padding: 10px 16px; 
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: center; 
+    height: 54px;
+    flex-shrink: 0;
+}
+
+.header-actions { display: flex; align-items: center; gap: 12px; }
+
+.user-config input { 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid var(--border); 
+    color: #fff; 
+    padding: 6px 14px; 
+    border-radius: 20px; 
+    font-size: 14px; 
+    width: 140px; 
+    outline: none;
+    text-align: center;
+}
+
+/* --- Layout Principal --- */
+.main-container { flex: 1; display: flex; width: 100%; height: calc(100vh - 54px); overflow: hidden; }
+
+.feed-container { flex: 1; display: grid; grid-template-rows: 1fr auto; height: 100%; }
+
+.posts-list { overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* --- Composants de messages --- */
+.post-card { background: var(--surface); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer; position: relative; }
+.post-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+/* --- Réduction de la taille des images --- */
+.post-image {
+    max-width: 250px; /* Limite la largeur */
+    max-height: 250px; /* Limite la hauteur */
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+/* --- Zone de saisie (Composer) --- */
+.composer { 
+    padding: 12px 24px; 
+    background: #06070d; 
+    border-top: 1px solid var(--border); 
+    width: 100%; 
+}
+
+.message-bar { 
+    background: rgba(255, 255, 255, 0.04); 
+    border: 1px solid var(--border); 
+    border-radius: 22px; 
+    display: flex; 
+    align-items: center; 
+    padding: 4px 8px; 
+    gap: 6px; 
+}
+
+.bar-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+.btn-send { background: var(--accent-gradient); color: #fff; width: 34px; height: 34px; border-radius: 50%; border: none; }
+
+.message-input { flex: 1; background: none; border: none; color: #fff; font-size: 14px; outline: none; padding-left: 4px; }
+
+.status-indicators { padding-left: 12px; margin-top: 4px; font-size: 11px; color: var(--accent); }
+
+/* --- Panneaux IDE et Thread --- */
+.thread-panel, .ide-panel { width: 400px; height: 100%; background: #08090f; border-left: 1px solid var(--border); display: none; flex-direction: column; z-index: 5; }
+.ide-panel { width: 550px; border-left: 2px solid rgba(134, 225, 252, 0.2); }
+.thread-panel.open, .ide-panel.open { display: flex; }
+
+.panel-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; height: 54px; }
+
+.ide-textarea { flex: 1; background: transparent; border: none; color: #a6e3a1; font-family: monospace; font-size: 14px; padding: 12px; resize: none; outline: none; }
+
+.ide-actions { padding: 12px 14px; background: #0d0f18; display: flex; gap: 8px; }
+
+.ide-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; flex: 1; }
+
+.ide-btn.run { background: #10b981; border: none; font-weight: 600; }
+
+.ide-console { height: 160px; background: #040508; border-top: 1px solid var(--border); display: flex; flex-direction: column; }
+
+/* --- Mobile --- */
+@media (max-width: 850px) {
+    .thread-panel, .ide-panel { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 100; }
     
+    /* Surélévation de la barre de message sur mobile */
+    .composer {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+        margin-bottom: 10px;
+    }
+}
+    </style>
 </head>
-    <script src="js/script.js" defer></script>
 <body>
-
-    <script src="js/script.js" defer></script>
-    
-
-
 
     <header>
         <div class="header-actions">
-            <button class="btn-reset-global" onclick="resetNetworkFeed()">
-                <i data-lucide="trash-2"></i> <span>Reset Global</span>
-            </button>
-            <button id="adminBtn" class="btn-header" onclick="verifyAdminStatus()">
-                <i data-lucide="shield"></i> <span id="adminBtnText">Vérifier Statut Admin</span>
-            </button>
             <div class="user-config">
                 <input type="text" id="usernameInput" value="Anonyme" maxlength="12">
             </div>
@@ -95,5 +214,202 @@
         </div>
     </div>
 
+<script>
+    const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://gundb-relay.onrender.com/gun']);
+    const postsNode = gun.get('mesh-posts-verif-v5');
+    const repliesNode = gun.get('mesh-replies-verif-v5');
+
+    const mySeed = 'u_' + Math.random().toString(36).substr(2, 4);
+    let activeThreadId = null;
+    let base64ImageCache = "";
+    let codeSnippetCache = "";
+    let codeLanguageCache = "javascript";
+    let pyodideInstance = null; 
+    let localPostsCache = {};
+
+    try { localPostsCache = JSON.parse(localStorage.getItem('mesh_posts_backup')) || {}; } catch(e) {}
+
+    const templates = {
+        javascript: `// Script JS\nlet message = "Hello World !";\nconsole.log(message);`,
+        python: `# Script Python\nfor i in range(3):\n    print(f"Ligne : {i}")`,
+        html: `\n<div style="padding:15px; text-align:center; color:#4f46e5;">\n  <h3>Rendu OK</h3>\n</div>`
+    };
+    document.getElementById('ideSource').value = templates.javascript;
+
+    if(localStorage.getItem('p2p-username-modern')) document.getElementById('usernameInput').value = localStorage.getItem('p2p-username-modern');
+    document.getElementById('usernameInput').addEventListener('input', (e) => localStorage.setItem('p2p-username-modern', e.target.value.trim()));
+
+    function openIDE(preloadedCode = "", lang = "javascript") {
+        document.getElementById('idePanel').classList.add('open');
+        document.getElementById('ideLang').value = lang;
+        if (preloadedCode) document.getElementById('ideSource').value = preloadedCode;
+        else adaptTemplateLanguage();
+        toggleOutputs();
+    }
+    function closeIDE() { document.getElementById('idePanel').classList.remove('open'); }
+    function adaptTemplateLanguage() {
+        const lang = document.getElementById('ideLang').value;
+        document.getElementById('ideSource').value = templates[lang];
+        toggleOutputs();
+    }
+
+    function toggleOutputs() {
+        const lang = document.getElementById('ideLang').value;
+        const consoleOut = document.getElementById('consoleOutput');
+        const htmlPreview = document.getElementById('htmlPreview');
+        if(lang === "html") {
+            consoleOut.style.display = "none"; htmlPreview.style.display = "block";
+            document.getElementById('consoleTitle').innerText = "LIVE VIEW";
+        } else {
+            consoleOut.style.display = "block"; htmlPreview.style.display = "none";
+            document.getElementById('consoleTitle').innerText = "CONSOLE";
+        }
+    }
+
+    async function executeCompiler() {
+        const lang = document.getElementById('ideLang').value;
+        const code = document.getElementById('ideSource').value;
+        const consoleOut = document.getElementById('consoleOutput');
+        const htmlPreview = document.getElementById('htmlPreview');
+        consoleOut.style.color = "#38bdf8"; consoleOut.innerText = "";
+
+        if (lang === "javascript") {
+            const originalLog = console.log;
+            console.log = function(...args) { consoleOut.innerText += args.join(' ') + '\n'; };
+            try {
+                new Function(code)();
+                if(!consoleOut.innerText) consoleOut.innerText = "> Exécuté.";
+            } catch (err) { consoleOut.style.color = "#ff5a79"; consoleOut.innerText = `❌ ${err.message}`; }
+            console.log = originalLog;
+        } else if (lang === "html") {
+            const dst = htmlPreview.contentDocument || htmlPreview.contentWindow.document;
+            dst.open(); dst.write(code); dst.close();
+        } else if (lang === "python") {
+            document.getElementById('pyLoading').style.display = "inline";
+            try {
+                if (!pyodideInstance) pyodideInstance = await loadPyodide();
+                pyodideInstance.runPython(`import sys\nimport io\nsys.stdout = io.StringIO()`);
+                await pyodideInstance.runPythonAsync(code);
+                consoleOut.innerText = pyodideInstance.runPython("sys.stdout.getvalue()") || "> Exécuté.";
+            } catch (err) { consoleOut.style.color = "#ff5a79"; consoleOut.innerText = `❌ ${err.message}`; }
+            document.getElementById('pyLoading').style.display = "none";
+        }
+    }
+
+    function injectIdeCodeIntoBar() {
+        const code = document.getElementById('ideSource').value.trim();
+        if(code) {
+            codeSnippetCache = code; codeLanguageCache = document.getElementById('ideLang').value;
+            updateIndicators(); closeIDE();
+        }
+    }
+
+    function handleImgUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 5000000) { alert("Limite maximale 5 Mo."); return; }
+        const reader = new FileReader();
+        reader.onload = function(e) { base64ImageCache = e.target.result; updateIndicators(); };
+        reader.readAsDataURL(file);
+    }
+
+    function updateIndicators() {
+        let text = "";
+        if (base64ImageCache) text += "📸 Img ";
+        if (codeSnippetCache) text += `💻 Code (${codeLanguageCache.toUpperCase()}) `;
+        document.getElementById('statusBox').innerText = text;
+    }
+
+    function publishNewPost() {
+        const inputEl = document.getElementById('postText');
+        const text = inputEl.value.trim();
+        const author = document.getElementById('usernameInput').value.trim() || "Anonyme";
+        if (!text && !base64ImageCache && !codeSnippetCache) return;
+        
+        const postId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        postsNode.get(postId).put({
+            id: postId, author: author, text: text,
+            image: base64ImageCache || "", code: codeSnippetCache || "", lang: codeLanguageCache,
+            timestamp: Date.now(), uid: mySeed
+        });
+        inputEl.value = ""; base64ImageCache = ""; codeSnippetCache = ""; document.getElementById('statusBox').innerText = "";
+    }
+
+    function publishNewReply() {
+        if (!activeThreadId) return;
+        const inputEl = document.getElementById('replyText');
+        const text = inputEl.value.trim();
+        const author = document.getElementById('usernameInput').value.trim() || "Anonyme";
+        if (!text) return;
+        
+        const replyId = 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        repliesNode.get(activeThreadId).get(replyId).put({
+            id: replyId, author: author, text: text, timestamp: Date.now()
+        });
+        inputEl.value = "";
+    }
+
+    function generateCardHTML(data, isReply = false) {
+        let imgTag = data.image ? `<img class="post-image" src="${escapeHTML(data.image)}">` : '';
+        let codeTag = data.code ? `<pre class="post-code-block" onclick="openIDE(\`${escapeHTML(data.code)}\`, '${escapeHTML(data.lang || 'javascript')}'); event.stopPropagation();"><span class="post-code-badge">${escapeHTML(data.lang || 'js')}</span><code>${escapeHTML(data.code)}</code></pre>` : '';
+        let footer = isReply ? '' : `<div class="post-actions"><div class="action-btn"><i data-lucide="message-circle" size="14"></i> Réponses</div></div>`;
+
+        return `
+            <div class="post-card" id="${data.id}" ${!isReply ? `onclick="openThread('${data.id}')"` : ''}>
+                <div class="post-meta">
+                    <span class="post-author">${escapeHTML(data.author)} <span>#${data.uid || 'anon'}</span></span>
+                    <span>${new Date(data.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                </div>
+                ${data.text ? `<div class="post-text">${escapeHTML(data.text)}</div>` : ''}
+                ${imgTag} ${codeTag} ${footer}
+            </div>
+        `;
+    }
+
+    postsNode.map().on((post, id) => {
+        if (!post || !id) return;
+        
+        const msgTime = post.timestamp || Date.now();
+
+        const cleanPost = {
+            id: post.id || id, author: post.author, text: post.text, image: post.image,
+            code: post.code, lang: post.lang, timestamp: msgTime, uid: post.uid
+        };
+        localPostsCache[id] = cleanPost;
+        try { localStorage.setItem('mesh_posts_backup', JSON.stringify(localPostsCache)); } catch(e) {}
+        
+        if (document.getElementById(id)) return;
+        const feed = document.getElementById('globalFeed');
+        const container = document.createElement('div'); container.innerHTML = generateCardHTML(cleanPost, false);
+        if (feed.firstChild) feed.insertBefore(container.firstElementChild, feed.firstChild);
+        else feed.appendChild(container.firstElementChild);
+        lucide.createIcons();
+    });
+
+    function openThread(postId) {
+        activeThreadId = postId;
+        const threadFeed = document.getElementById('threadFeed'); threadFeed.innerHTML = '';
+        document.getElementById('threadPanel').classList.add('open');
+        postsNode.get(postId).once((parentPost) => {
+            if (!parentPost) return;
+            const container = document.createElement('div'); container.innerHTML = generateCardHTML(parentPost, true);
+            threadFeed.appendChild(container.firstElementChild);
+            
+            repliesNode.get(postId).map().on((reply, rId) => {
+                if (!reply || document.getElementById(rId)) return;
+                const rContainer = document.createElement('div'); rContainer.innerHTML = generateCardHTML(reply, true);
+                threadFeed.appendChild(rContainer.firstElementChild);
+                lucide.createIcons();
+            });
+        });
+    }
+
+    function closeThread() { document.getElementById('threadPanel').classList.remove('open'); activeThreadId = null; }
+    document.getElementById('postText').onkeydown = function(e) { if (e.key === 'Enter') { e.preventDefault(); publishNewPost(); } };
+    document.getElementById('replyText').onkeydown = function(e) { if (e.key === 'Enter') { e.preventDefault(); publishNewReply(); } };
+    function escapeHTML(str) { return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
+
+    lucide.createIcons();
+</script>
 </body>
 </html>
